@@ -187,15 +187,15 @@ dsh plugin --profile web add @js2hou/dsh-mcp-manager
 
 ## 🏗️ 架构
 
-- **宿主端**（`src/index.ts`）注册一个仅限 loopback 的 Connection RPC 通道 `/mcp-manager`：`list`（遍历 `ctx.loader` 中的 `@deepseek-ai/dsh-mcp-client` 条目 + `ctx.tools` 统计工具数）、`add` / `remove` / `setEnabled` / `update`（编辑 profile 补丁层，持久化并经 HMR 应用）、`probe`（独立 MCP SDK 连接探测）、`patchInfo`。运行时零 `@deepseek-ai` 依赖（js-yaml 方言、`isJsExpr` 均内联），可放在任意路径安装。
-- **浏览器端**（`src/client`）注册 设置 → MCP 页（`settings.section` 槽位，order 18），经 `ctx.locale` 提供中英双语，与宿主端仅通过 RPC 通道通信——浏览器端不直接访问文件系统。
+- **宿主端**（`src/index.ts`）在共享 Connection 通道上注册经认证的精确 Fetch 路由 `/api/mcp-manager/*`：`list`（遍历 `ctx.loader` 中的 `@deepseek-ai/dsh-mcp-client` 条目 + `ctx.tools` 统计工具数）、`add` / `remove` / `setEnabled` / `update`（编辑 profile 补丁层，持久化并经 HMR 应用）、`probe`（独立 MCP SDK 连接探测）、`patchInfo`。运行时零 `@deepseek-ai` 依赖（js-yaml 方言、`isJsExpr` 均内联），可放在任意路径安装。
+- **浏览器端**（`src/client`）注册 设置 → MCP 页（`settings.section` 槽位，order 18），经 `ctx.locale` 提供中英双语，与宿主端仅通过 RPC 路由通信——浏览器端不直接访问文件系统。
 - **测试 fixture**：`test/fixtures/mcp-test-server.mjs` 是一个最小 MCP stdio 服务器，用于端到端验证。
 
 ## 开发
 
 ```bash
 pnpm install
-pnpm typecheck   # tsc --noEmit；tsconfig paths 指向你的 DSH 安装目录下的 lib/types
+pnpm typecheck   # tsc --noEmit；SDK 类型来自 devDependencies 中固定版本的 @deepseek-ai/* 包
 pnpm build       # esbuild：lib/index.js（宿主端）+ lib/client.js（ModuleLoader 浏览器 bundle）
 ```
 

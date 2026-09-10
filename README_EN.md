@@ -187,15 +187,15 @@ The plugin's loader row accepts one optional field:
 
 ## 🏗️ Architecture
 
-- **Host half** (`src/index.ts`) registers a loopback-only Connection RPC channel `/mcp-manager`: `list` (enumerates `@deepseek-ai/dsh-mcp-client` entries via `ctx.loader` + tool counts via `ctx.tools`), `add` / `remove` / `setEnabled` / `update` (edits the profile patch layer, persisted and HMR-applied), `probe` (independent MCP SDK connectivity probe), `patchInfo`. Zero runtime `@deepseek-ai` imports (the js-yaml `!!js` dialect and `isJsExpr` are inlined), so it can be installed from any path.
-- **Browser half** (`src/client`) registers the Settings → MCP section (`settings.section` slot, order 18), provides zh/en copy via `ctx.locale`, and talks to the host exclusively over the RPC channel — it never touches the filesystem.
+- **Host half** (`src/index.ts`) registers authenticated exact Fetch routes `/api/mcp-manager/*` on the shared Connection channel: `list` (enumerates `@deepseek-ai/dsh-mcp-client` entries via `ctx.loader` + tool counts via `ctx.tools`), `add` / `remove` / `setEnabled` / `update` (edits the profile patch layer, persisted and HMR-applied), `probe` (independent MCP SDK connectivity probe), `patchInfo`. Zero runtime `@deepseek-ai` imports (the js-yaml `!!js` dialect and `isJsExpr` are inlined), so it can be installed from any path.
+- **Browser half** (`src/client`) registers the Settings → MCP section (`settings.section` slot, order 18), provides zh/en copy via `ctx.locale`, and talks to the host exclusively over the RPC routes — it never touches the filesystem.
 - **Test fixture** — `test/fixtures/mcp-test-server.mjs` is a minimal MCP stdio server for end-to-end verification.
 
 ## Development
 
 ```bash
 pnpm install
-pnpm typecheck   # tsc --noEmit; tsconfig paths point at your DSH install's lib/types
+pnpm typecheck   # tsc --noEmit; SDK types come from the pinned @deepseek-ai/* devDependencies
 pnpm build       # esbuild: lib/index.js (host) + lib/client.js (ModuleLoader browser bundle)
 ```
 

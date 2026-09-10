@@ -9,8 +9,16 @@
 /** The package that implements an MCP server bridge in the harness. */
 export const MCP_CLIENT_PACKAGE = '@deepseek-ai/dsh-mcp-client'
 
-/** Logical Connection RPC channel registered by the host half. */
-export const RPC_CHANNEL = '/mcp-manager'
+/**
+ * Shared Connection RPC channel. Plugin-owned endpoints ride the gateway's
+ * authenticated `/api` channel as exact Fetch routes: 0.1.5's dedicated
+ * `connection.rpc.handle` channels resolve the web server from the Connection
+ * provider's own fiber, which a sibling plugin cannot reach.
+ */
+export const RPC_CHANNEL = '/api'
+
+/** Endpoint namespace for this plugin's routes on the shared channel. */
+export const RPC_ENDPOINT_PREFIX = 'mcp-manager'
 
 /** Supported MCP transports. */
 export type McpTransport = 'stdio' | 'streamable-http'

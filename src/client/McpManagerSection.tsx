@@ -13,7 +13,7 @@
  * @module dsh-mcp-manager/client/McpManagerSection
  */
 import { useCallback, useEffect, useMemo, useReducer, useState } from 'react'
-import type { ClientContext } from '@deepseek-ai/dsh-client-runtime/client'
+import type { Context as ClientContext } from '@deepseek-ai/cordis'
 // Type-only: pulls `Context { locale }` into the program.
 import type {} from '@deepseek-ai/dsh-client-locale/client'
 import type { TranslateNS } from '@deepseek-ai/dsh-client-ui-slots'

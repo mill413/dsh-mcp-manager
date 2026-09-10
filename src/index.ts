@@ -11,8 +11,8 @@
  *    the tree, so changes apply live without a restart);
  *  - runs an independent live connectivity probe per server on demand.
  *
- * The browser half talks to this host half over a loopback-only Connection RPC
- * channel (`/mcp-manager`).
+ * The browser half talks to this host half over authenticated exact Fetch
+ * routes under the shared Connection channel (`/api/mcp-manager/*`).
  *
  * Config (row config in cordis.patch.yml; all optional):
  *   patchFile   absolute path of the user patch layer to edit
@@ -23,7 +23,7 @@ import { existsSync } from 'node:fs'
 import type { Context } from '@deepseek-ai/cordis'
 // Type-only: loads the `Context { connection }` declaration merge into the program.
 import type {} from '@deepseek-ai/dsh-client-connection'
-import { RPC_CHANNEL, type McpServerInfo } from './shared.ts'
+import { RPC_CHANNEL, RPC_ENDPOINT_PREFIX, type McpServerInfo } from './shared.ts'
 import {
   addMcpRow,
   editPatchList,
@@ -42,8 +42,16 @@ import type { McpEndpoint, McpProbeResult, McpServerConfig } from './shared.ts'
 /** Stable plugin id for loader rows. */
 export const name = 'mcp-manager'
 
-/** Required services: the Connection RPC registry, the loader tree, tools. */
+/**
+ * Required services: the Connection Fetch-route registry, the loader tree, and
+ * the tool registry.
+ */
 export const inject = ['connection', 'loader', 'tools']
+
+/** RPC operations, each registered as an exact route under the shared channel. */
+const ENDPOINTS: readonly McpEndpoint[] = [
+  'list', 'add', 'remove', 'setEnabled', 'update', 'probe', 'patchInfo',
+]
 
 /** Raw row config — every field defaults in code. */
 export interface McpManagerRowConfig {
@@ -70,7 +78,8 @@ interface PatchInfo {
 }
 
 /**
- * Plugin body: register the RPC channel and dispatch MCP management commands.
+ * Plugin body: register one authenticated RPC route per endpoint and dispatch
+ * MCP management commands.
  * @param ctx - plugin context.
  * @param rawConfig - raw row config (optional).
  */
@@ -79,21 +88,50 @@ export function apply(ctx: Context, rawConfig?: McpManagerRowConfig): void {
   const logger = ctx.logger('mcp-manager')
 
   ctx.effect(() => {
-    // The generic RPC channel's declared envelope is the closed api-map
-    // `RpcError` union; this plugin-owned channel speaks its own open error
-    // codes, so the handler is cast at the boundary (wire envelope unchanged).
-    const handler = (async (endpoint: string, payload: unknown) =>
-      dispatch(ctx, patchFile, endpoint as McpEndpoint, payload)) as unknown as
-      Parameters<typeof ctx.connection.rpc.handle>[1]
-    const dispose = ctx.connection.rpc.handle(
-      RPC_CHANNEL,
-      handler,
-      { authority: 'loopback' },
-    )
-    return () => { void dispose() }
-  }, 'mcp-manager: rpc channel')
+    const disposers = ENDPOINTS.map((endpoint) => ctx.connection.fetch.register({
+      path: `${RPC_CHANNEL}/${RPC_ENDPOINT_PREFIX}/${endpoint}`,
+      methods: ['POST'],
+      requestBody: 'buffered',
+      fetch: (request) => handleRpcRequest(ctx, patchFile, endpoint, request),
+    }))
+    return () => { for (const dispose of disposers) void dispose() }
+  }, 'mcp-manager: rpc routes')
 
   logger.info('mcp-manager active (patch file: %s)', patchFile)
+}
+
+/**
+ * Serve one RPC call. The shared `/api` route applies the Host/Origin fence
+ * and browser authentication before this handler runs, so no extra check is
+ * needed here; the envelope is the Connection `client-request` shape.
+ */
+async function handleRpcRequest(
+  ctx: Context,
+  patchFile: string,
+  endpoint: McpEndpoint,
+  request: Request,
+): Promise<Response> {
+  let body: unknown
+  try {
+    body = await request.json()
+  } catch {
+    return jsonResponse(400, { error: 'body is not JSON' })
+  }
+  if (!isRecord(body)
+    || body['type'] !== 'client-request'
+    || typeof body['rpcId'] !== 'string') {
+    return jsonResponse(400, { error: 'invalid client-request envelope' })
+  }
+  const result = await dispatch(ctx, patchFile, endpoint, body['payload'])
+  return jsonResponse(200, { type: 'server-response', rpcId: body['rpcId'], result })
+}
+
+/** Serialize a JSON response body. */
+function jsonResponse(status: number, value: unknown): Response {
+  return new Response(JSON.stringify(value), {
+    status,
+    headers: { 'content-type': 'application/json' },
+  })
 }
 
 /** Route one RPC endpoint to its implementation. */
