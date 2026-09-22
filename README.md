@@ -1,3 +1,5 @@
+> Local fork: `@mill413/dsh-mcp-manager`. This scoped package is maintained locally and has not been published by this migration. Install the verified local tarball. Upstream attribution and repository history are retained.
+
 # dsh-mcp-manager
 
 <!-- Hero -->
@@ -11,7 +13,6 @@
 
 <div align="center">
 
-[![npm version](https://img.shields.io/npm/v/@js2hou/dsh-mcp-manager?logo=npm&color=cb3837)](https://www.npmjs.com/package/@js2hou/dsh-mcp-manager)
 [![License](https://img.shields.io/github/license/Js2Hou/dsh-mcp-manager)](LICENSE)
 [![DSH Desktop](https://img.shields.io/badge/DSH%20Desktop-ready-000000)](https://github.com/anywhere-labs/deepseek-harness-desktop)
 
@@ -94,7 +95,7 @@
 ### 方式三 · dsh 命令安装
 
 ```sh
-dsh plugin --profile web add @js2hou/dsh-mcp-manager
+dsh plugin --profile web add @mill413/dsh-mcp-manager
 ```
 
 也可 **GitHub 源安装**（构建产物 `lib/` 已入库，无需本地构建）：
@@ -131,10 +132,10 @@ irm https://raw.githubusercontent.com/Js2Hou/dsh-mcp-manager/main/scripts/instal
 cd ~/.dsh/profiles/web
 
 # ① 放行「发布不足 24h」的新版本（装老版本可跳过；若已有该键，把下面那行并入其下即可）
-printf '\nminimumReleaseAgeExclude:\n  - @js2hou/dsh-mcp-manager\n' >> pnpm-workspace.yaml
+printf '\nminimumReleaseAgeExclude:\n  - @mill413/dsh-mcp-manager\n' >> pnpm-workspace.yaml
 
 # ② 安装并自动挂载（npm 包；本地 checkout 请用 link: 绝对路径）
-npx -y --package @deepseek-ai/dsh dsh plugin --profile web add @js2hou/dsh-mcp-manager
+npx -y --package @deepseek-ai/dsh dsh plugin --profile web add @mill413/dsh-mcp-manager
 ```
 
 **Windows（PowerShell）**：
@@ -142,11 +143,11 @@ npx -y --package @deepseek-ai/dsh dsh plugin --profile web add @js2hou/dsh-mcp-m
 ```powershell
 cd ~\.dsh\profiles\web
 
-# ① 放行新版本（一次性；若已有该键，把 - @js2hou/dsh-mcp-manager 并入其下即可）
-Add-Content -Path pnpm-workspace.yaml -Value "`nminimumReleaseAgeExclude:`n  - @js2hou/dsh-mcp-manager"
+# ① 放行新版本（一次性；若已有该键，把 - @mill413/dsh-mcp-manager 并入其下即可）
+Add-Content -Path pnpm-workspace.yaml -Value "`nminimumReleaseAgeExclude:`n  - @mill413/dsh-mcp-manager"
 
 # ② 安装并自动挂载
-npx -y --package @deepseek-ai/dsh dsh plugin --profile web add @js2hou/dsh-mcp-manager
+npx -y --package @deepseek-ai/dsh dsh plugin --profile web add @mill413/dsh-mcp-manager
 ```
 
 > `dsh plugin --profile web add` 会自动：登记依赖 → 识别包内 `dsh.bundle.patch` → 注册进 `dsh.profile.bundles` 挂载，无需手改 `cordis.patch.yml`。
@@ -159,7 +160,7 @@ npx -y --package @deepseek-ai/dsh dsh plugin --profile web add @js2hou/dsh-mcp-m
 <summary><b>更新</b></summary>
 
 ```sh
-dsh plugin --profile web add @js2hou/dsh-mcp-manager
+dsh plugin --profile web add @mill413/dsh-mcp-manager
 ```
 
 或重跑一次一键脚本；也可把 `~/.dsh/profiles/web/package.json` 里的版本号改高后 `pnpm install`。本地 checkout 模式：`git pull` 后 `pnpm build`（client 改动硬刷新浏览器即可；host 改动需重启 DSH）。
@@ -199,15 +200,15 @@ dsh plugin --profile web add @js2hou/dsh-mcp-manager
 
 ## 🏗️ 架构
 
-- **宿主端**（`src/index.ts`）注册一个仅限 loopback 的 Connection RPC 通道 `/mcp-manager`：`list`（遍历 `ctx.loader` 中的 `@deepseek-ai/dsh-mcp-client` 条目 + `ctx.tools` 统计工具数）、`add` / `remove` / `setEnabled` / `update`（编辑 profile 补丁层，持久化并经 HMR 应用）、`probe`（独立 MCP SDK 连接探测）、`patchInfo`。运行时零 `@deepseek-ai` 依赖（js-yaml 方言、`isJsExpr` 均内联），可放在任意路径安装。
-- **浏览器端**（`src/client`）注册 设置 → MCP 页（`settings.section` 槽位，order 18），经 `ctx.locale` 提供中英双语，与宿主端仅通过 RPC 通道通信——浏览器端不直接访问文件系统。
+- **宿主端**（`src/index.ts`）在共享 Connection 通道上注册经认证的精确 Fetch 路由 `/api/mcp-manager/*`：`list`（遍历 `ctx.loader` 中的 `@deepseek-ai/dsh-mcp-client` 条目 + `ctx.tools` 统计工具数）、`add` / `remove` / `setEnabled` / `update`（编辑 profile 补丁层，持久化并经 HMR 应用）、`probe`（独立 MCP SDK 连接探测）、`patchInfo`。运行时零 `@deepseek-ai` 依赖（js-yaml 方言、`isJsExpr` 均内联），可放在任意路径安装。
+- **浏览器端**（`src/client`）注册 设置 → MCP 页（`settings.section` 槽位，order 18），经 `ctx.locale` 提供中英双语，与宿主端仅通过 RPC 路由通信——浏览器端不直接访问文件系统。
 - **测试 fixture**：`test/fixtures/mcp-test-server.mjs` 是一个最小 MCP stdio 服务器，用于端到端验证。
 
 ## 开发
 
 ```bash
 pnpm install
-pnpm typecheck   # tsc --noEmit；tsconfig paths 指向你的 DSH 安装目录下的 lib/types
+pnpm typecheck   # tsc --noEmit；SDK 类型来自 devDependencies 中固定版本的 @deepseek-ai/* 包
 pnpm build       # esbuild：lib/index.js（宿主端）+ lib/client.js（ModuleLoader 浏览器 bundle）
 ```
 

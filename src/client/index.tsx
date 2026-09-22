@@ -5,15 +5,17 @@
  * beside 通用设置 / 模型 / 插件 / Agent 预设), hosting the server list,
  * add/remove, enable/disable and connection-status tools. Copy is localized
  * (zh/en) and follows the GUI's active locale automatically. All data flows
- * over the loopback-only `/mcp-manager` Connection RPC channel registered by
+ * over the authenticated `/api/mcp-manager/*` Connection Fetch routes
+ * registered by
  * the node half; the browser never touches the host filesystem directly.
  *
  * @module dsh-mcp-manager/client
  */
-import type { ClientContext } from '@deepseek-ai/dsh-client-runtime/client'
-// Type-only: pulls the slot-registry Context merge (ctx.slots) and the
-// settings-slot declarations (`settings.section`) into this program so the
-// register call below type-checks.
+import type { Context as ClientContext } from '@deepseek-ai/cordis'
+// Type-only: pulls the slot-registry Context merge (ctx.slots) into this
+// program, plus the settings-slot declarations (`settings.section`) and the
+// locale Context merge (ctx.locale) so the calls below type-check.
+import type {} from '@deepseek-ai/dsh-client-ui-renderer/client'
 import type {} from '@deepseek-ai/dsh-client-ui-slots'
 import type {} from '@deepseek-ai/dsh-client-ui-settings/client'
 import type {} from '@deepseek-ai/dsh-client-locale/client'

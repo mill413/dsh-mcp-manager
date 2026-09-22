@@ -10,9 +10,7 @@
  *                    `require(...)` calls resolved from the runtime registry.
  *
  * Optional typecheck: `node scripts/build.mjs --typecheck` runs `tsc --noEmit`
- * using the paths in tsconfig.json (point them at your DSH checkout's built
- * lib/types outputs, or export DSH_PACKAGES_DIR and run
- * `node scripts/build.mjs --gen-tsconfig` to regenerate the paths block).
+ * against the pinned `@deepseek-ai/*` devDependencies (no external paths).
  *
  * @module dsh-mcp-manager/scripts/build
  */

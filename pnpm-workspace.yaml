@@ -1,4 +1,40 @@
+# pnpm 11 defaults. This is a single-package repo (no workspace members); the
+# DeepSeek Harness SDK is pinned exactly in devDependencies for type-check and
+# build, and declared in peerDependencies for the host-provided runtime copies.
+
 # pnpm 11 默认拦截依赖的构建脚本；放行 esbuild 的 postinstall（其二进制也可
 # 通过平台包直接解析，但放行可避免 pnpm install 以 ERR_PNPM_IGNORED_BUILDS 退出）。
 allowBuilds:
   esbuild: true
+
+# SDK declarations cross-reference sibling SDK packages; hoist them so those
+# bare specifiers resolve from the root type-check program too.
+publicHoistPattern:
+  - '@deepseek-ai/*'
+
+# The pinned SDK prerelease is younger than pnpm's install-age gate; these are
+# the exact versions this repository was verified against.
+minimumReleaseAgeExclude:
+  - '@deepseek-ai/dsh-agent@0.1.6-alpha.2'
+  - '@deepseek-ai/dsh-brand@0.1.6-alpha.2'
+  - '@deepseek-ai/dsh-client-connection@0.1.6-alpha.2'
+  - '@deepseek-ai/dsh-client-locale@0.1.6-alpha.2'
+  - '@deepseek-ai/dsh-client-ui-renderer@0.1.6-alpha.2'
+  - '@deepseek-ai/dsh-client-ui-settings@0.1.6-alpha.2'
+  - '@deepseek-ai/dsh-client-ui-slots@0.1.6-alpha.2'
+  - '@deepseek-ai/dsh-credentials@0.1.6-alpha.2'
+  - '@deepseek-ai/dsh-invariants@0.1.6-alpha.2'
+  - '@deepseek-ai/dsh-llm@0.1.6-alpha.2'
+  - '@deepseek-ai/dsh-ptc-runtime@0.1.6-alpha.2'
+  - '@deepseek-ai/dsh-sandbox@0.1.6-alpha.2'
+  - '@deepseek-ai/dsh-sandbox-policy@0.1.6-alpha.2'
+  - '@deepseek-ai/dsh-scope@0.1.6-alpha.2'
+  - '@deepseek-ai/dsh-session@0.1.6-alpha.2'
+  - '@deepseek-ai/dsh-session-projection@0.1.6-alpha.2'
+  - '@deepseek-ai/dsh-system-prompt@0.1.6-alpha.2'
+  - '@deepseek-ai/dsh-timeout@0.1.6-alpha.2'
+  - '@deepseek-ai/dsh-tools@0.1.6-alpha.2'
+  - '@deepseek-ai/dsh-typert-protocol@0.1.6-alpha.2'
+  - '@deepseek-ai/dsh-user-approval@0.1.6-alpha.2'
+  - '@deepseek-ai/dsh-util-crypto@0.1.6-alpha.2'
+  - '@deepseek-ai/dsh-util-values@0.1.6-alpha.2'

@@ -1,12 +1,13 @@
 /**
- * Typed client for the `/mcp-manager` host RPC channel. Thin wrapper over
- * `ctx.connection.rpc.call` with the host's reply envelope.
+ * Typed client for the plugin's host RPC endpoints. Thin wrapper over
+ * `ctx.connection.rpc.call` on the shared `/api` channel with the host's reply
+ * envelope.
  *
  * @module dsh-mcp-manager/client/rpc
  */
-import type { ClientContext } from '@deepseek-ai/dsh-client-runtime/client'
+import type { Context as ClientContext } from '@deepseek-ai/cordis'
 import type { ClientConnectionRpc } from '@deepseek-ai/dsh-client-connection/client'
-import { RPC_CHANNEL, type McpEndpoint } from '../shared.ts'
+import { RPC_CHANNEL, RPC_ENDPOINT_PREFIX, type McpEndpoint } from '../shared.ts'
 
 /** Minimal mirror of the host's RpcResult envelope. */
 type RpcResult<T> =
@@ -51,7 +52,11 @@ export async function callRpc<T>(
   endpoint: McpEndpoint,
   payload?: unknown,
 ): Promise<T> {
-  const raw = await connectionRpcOf(ctx).call(RPC_CHANNEL, endpoint, payload ?? null)
+  const raw = await connectionRpcOf(ctx).call(
+    RPC_CHANNEL,
+    `${RPC_ENDPOINT_PREFIX}/${endpoint}`,
+    payload ?? null,
+  )
   const result = raw as unknown as RpcResult<T>
   if (result.ok) return result.value
   throw new McpManagerRpcError(result.error)
