@@ -1,6 +1,6 @@
 {
   "$comment": "Marketplace registry for dsh-mcp-manager. The check-listings.mjs script polls every entry daily and rewrites the <!-- listings:start --> block in README.md / README_EN.md. Add a newly discovered marketplace here (id, label, url, detect) and the badge row will be maintained automatically.",
-  "package": "@js2hou/dsh-mcp-manager",
+  "package": "@mill413/dsh-mcp-manager",
   "repo": "Js2Hou/dsh-mcp-manager",
   "marketplaces": [
     {

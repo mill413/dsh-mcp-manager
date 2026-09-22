@@ -1,3 +1,5 @@
+> Local fork: `@mill413/dsh-mcp-manager`. This scoped package is maintained locally and has not been published by this migration. Install the verified local tarball. Upstream attribution and repository history are retained.
+
 # dsh-mcp-manager
 
 <!-- Hero -->
@@ -11,7 +13,6 @@
 
 <div align="center">
 
-[![npm version](https://img.shields.io/npm/v/@js2hou/dsh-mcp-manager?logo=npm&color=cb3837)](https://www.npmjs.com/package/@js2hou/dsh-mcp-manager)
 [![License](https://img.shields.io/github/license/Js2Hou/dsh-mcp-manager)](LICENSE)
 [![DSH Desktop](https://img.shields.io/badge/DSH%20Desktop-ready-000000)](https://github.com/anywhere-labs/deepseek-harness-desktop)
 
@@ -82,7 +83,7 @@ Pick one of the marketplaces:
 ### Option 3 · dsh CLI
 
 ```sh
-dsh plugin --profile web add @js2hou/dsh-mcp-manager
+dsh plugin --profile web add @mill413/dsh-mcp-manager
 ```
 
 Or install straight from GitHub (the built `lib/` bundles are committed, so no local build is needed):
@@ -119,10 +120,10 @@ Then **hard-refresh the browser** (Cmd/Ctrl+Shift+R) and open **Settings → MCP
 cd ~/.dsh/profiles/web
 
 # ① Exclude a freshly published version from pnpm's 24h minimum-release-age
-printf '\nminimumReleaseAgeExclude:\n  - @js2hou/dsh-mcp-manager\n' >> pnpm-workspace.yaml
+printf '\nminimumReleaseAgeExclude:\n  - @mill413/dsh-mcp-manager\n' >> pnpm-workspace.yaml
 
 # ② Install + auto-mount (npm package; use an absolute link: path for a local checkout)
-npx -y --package @deepseek-ai/dsh dsh plugin --profile web add @js2hou/dsh-mcp-manager
+npx -y --package @deepseek-ai/dsh dsh plugin --profile web add @mill413/dsh-mcp-manager
 ```
 
 **Windows (PowerShell)**:
@@ -131,10 +132,10 @@ npx -y --package @deepseek-ai/dsh dsh plugin --profile web add @js2hou/dsh-mcp-m
 cd ~\.dsh\profiles\web
 
 # ① Exclude fresh versions (one-time; merge the line if the key already exists)
-Add-Content -Path pnpm-workspace.yaml -Value "`nminimumReleaseAgeExclude:`n  - @js2hou/dsh-mcp-manager"
+Add-Content -Path pnpm-workspace.yaml -Value "`nminimumReleaseAgeExclude:`n  - @mill413/dsh-mcp-manager"
 
 # ② Install + auto-mount
-npx -y --package @deepseek-ai/dsh dsh plugin --profile web add @js2hou/dsh-mcp-manager
+npx -y --package @deepseek-ai/dsh dsh plugin --profile web add @mill413/dsh-mcp-manager
 ```
 
 > `dsh plugin --profile web add` registers the dependency, detects the package's `dsh.bundle.patch`, and adds it to `dsh.profile.bundles` — no manual `cordis.patch.yml` edits needed.
@@ -147,7 +148,7 @@ npx -y --package @deepseek-ai/dsh dsh plugin --profile web add @js2hou/dsh-mcp-m
 <summary><b>Update</b></summary>
 
 ```sh
-dsh plugin --profile web add @js2hou/dsh-mcp-manager
+dsh plugin --profile web add @mill413/dsh-mcp-manager
 ```
 
 Or re-run the one-liner; alternatively bump the version in `~/.dsh/profiles/web/package.json` and run `pnpm install`. Local-checkout mode: `git pull` then `pnpm build` (client changes need only a hard refresh; host changes need a DSH restart).
