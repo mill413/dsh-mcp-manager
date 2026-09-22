@@ -76,7 +76,12 @@
     "typescript": "^5.9.0"
   },
   "license": "MIT",
-  "publishConfig": {
-    "access": "public"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mill413/dsh-mcp-manager.git"
+  },
+  "homepage": "https://github.com/mill413/dsh-mcp-manager#readme",
+  "bugs": {
+    "url": "https://github.com/mill413/dsh-mcp-manager/issues"
   }
 }
